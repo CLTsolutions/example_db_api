@@ -2,54 +2,43 @@ let express = require('express')
 let router = express.Router()
 const { Post, User } = require('../models')
 
-router.get("", (req, res) => {
-    res.send("Hello from the posts route")
-})
-
 router.post("/create/", async(req, res) => {
-    let message
+    let message;
+
     try{
-        let u = await User.findOne({
-            where: { id: req.body.id }
-        })
+        let u = await User.findOne({ where: { id: req.body.id } })
         if (u) {
-            let post = await Post.create({
-                content: req.body.content
-            })
+            let post = await Post.create({ content: req.body.content })
             await u.addPost(post)
-            message = {
-                message: "Post made!",
-                data: post
-            }    
+
+            let { id, content } = await Post.findOne({ where: { id: post.id } })
+            message = { message: "Post made!", data: { id, content }}    
         }
         else {
-            message = {
-                message: "Can't make a post, user does not exist",
-                data: null
-            }
+            message = { message: "Can't make a post, user does not exist", data: null }
         }
+
     } catch(err) {
-        message = {
-            message: "Post Create Failed"
-        }
+        message = { message: "Post Create Failed" }
     }
 
     res.json(message)
+
 })
 
 router.get("/all/:id", async(req, res) => {
     let u = await User.findOne({ where: { id: req.params.id }})
     let posts = u ? await u.getPosts() : null
     if (posts){
-        res.send(
-            posts.map( p => {
+        let cleaned_posts = posts.map( p => {
                     const { id, content } = p
                     return { id, content }
-            })
-        )
+        })
+
+        res.send(cleaned_posts)
     }
     else
-        res.send([])
+        res.send(posts)
 })
 
 module.exports = router

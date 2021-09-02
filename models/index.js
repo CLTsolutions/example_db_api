@@ -14,7 +14,7 @@ User.hasMany(Post)
 Post.belongsTo(User)
 
 // Sync
-synceDb(sequelize, true)
+synceDb(sequelize, { alter:true })
 
 
 module.exports = { User, Post }

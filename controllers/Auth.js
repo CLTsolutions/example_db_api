@@ -2,10 +2,6 @@ let express = require('express')
 let router = express.Router()
 const { User } = require('../models')
 
-router.get("", (req, res) => {
-    res.send("Hello World!@#!@#")
-})
-
 router.post("/create/:name", async (req, res) => {
     let message 
     console.log(User)
